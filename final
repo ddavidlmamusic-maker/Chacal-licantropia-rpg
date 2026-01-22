@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<title>Chacal – Criador de Ficha</title>
+
+<style>
+:root{
+  --bg:#070707;
+  --card:#111;
+  --border:#2a2a2a;
+  --red:#b30000;
+  --redGlow:#ff1a1a;
+  --text:#e6e6e6;
+  --muted:#aaa;
+}
+
+*{ box-sizing:border-box; }
+
+body{
+  background:radial-gradient(circle at top, #120000, var(--bg));
+  color:var(--text);
+  font-family:"Segoe UI", Arial, sans-serif;
+  padding:24px;
+}
+
+h1{
+  text-align:center;
+  font-size:2.6em;
+  letter-spacing:2px;
+  margin-bottom:20px;
+}
+
+h2{
+  border-left:4px solid var(--red);
+  padding-left:10px;
+  margin-bottom:10px;
+}
+
+h3{ color:var(--muted); margin-top:12px; }
+
+.box{
+  background:linear-gradient(180deg, #141414, #0c0c0c);
+  border:1px solid var(--border);
+  border-radius:14px;
+  padding:18px;
+  margin-bottom:22px;
+  box-shadow:0 0 25px rgba(0,0,0,.7);
+}
+
+label{
+  display:block;
+  margin-top:10px;
+  font-size:.9em;
+  color:var(--muted);
+}
+
+input, textarea{
+  width:100%;
+  padding:10px;
+  background:#0a0a0a;
+  color:#fff;
+  border:1px solid var(--border);
+  border-radius:8px;
+  margin-top:4px;
+}
+
+textarea{ min-height:100px; resize:vertical; }
+
+input:focus, textarea:focus{
+  outline:none;
+  border-color:var(--red);
+  box-shadow:0 0 8px rgba(179,0,0,.5);
+}
+
+button{
+  width:100%;
+  padding:10px;
+  margin-top:8px;
+  background:linear-gradient(180deg,var(--red),#700);
+  border:none;
+  border-radius:10px;
+  color:white;
+  font-weight:bold;
+  cursor:pointer;
+}
+
+button:hover{
+  background:linear-gradient(180deg,var(--redGlow),var(--red));
+  box-shadow:0 0 14px rgba(255,26,26,.6);
+}
+
+.topButtons{
+  display:flex;
+  gap:10px;
+  margin-bottom:15px;
+}
+
+/* STATUS */
+.status{
+  display:flex;
+  gap:14px;
+  margin-top:10px;
+}
+
+.dot{
+  width:26px;
+  height:26px;
+  border-radius:50%;
+  background:#333;
+  border:2px solid #555;
+  cursor:pointer;
+}
+
+.dot.white{ background:#fff; }
+.dot.pink{ background:#ff69b4; }
+.dot.red{ background:var(--red); }
+
+.morrendo{ background:linear-gradient(#000,#300); }
+.morto{ background:linear-gradient(#300,#000); }
+
+.overlayText{
+  margin-top:12px;
+  text-align:center;
+  font-size:26px;
+  font-weight:bold;
+  color:var(--redGlow);
+}
+
+/* TELA DE FICHAS */
+#telaFichas{
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,.95);
+  padding:30px;
+  display:none;
+  overflow:auto;
+  z-index:10;
+}
+
+.fichaBtn{
+  background:#111;
+  border:1px solid var(--border);
+  border-radius:10px;
+  padding:14px;
+  margin-top:10px;
+}
+</style>
+</head>
+
+<body id="body">
+
+<div class="topButtons">
+  <button onclick="abrirTelaFichas()">📂 Minhas Fichas</button>
+  <button onclick="compartilhar()">🔗 Compartilhar Ficha</button>
+</div>
+
+<h1>🐺 CHACAL – LICANTROPIA RPG</h1>
+
+<!-- JOGADOR -->
+<div class="box">
+<h2>Jogador & Personagem</h2>
+<label>Nome do Jogador</label><input id="nomeJogador">
+<label>Nome do Personagem</label><input id="nomePersonagem">
+<label>Idade</label><input id="idade">
+<label>Ocupação</label><input id="ocupacao">
+</div>
+
+<!-- NÍVEL -->
+<div class="box">
+<h2>Nível & Experiência</h2>
+<label>Nível</label><input id="nivel">
+<label>Experiência</label><input id="xp">
+</div>
+
+<!-- ATRIBUTOS BASE -->
+<div class="box">
+<h2>Atributos Base</h2>
+<label>Corpo</label><input id="corpo" oninput="calc()">
+<label>Mente</label><input id="mente" oninput="calc()">
+<label>Poder</label><input id="poder" oninput="calc()">
+</div>
+
+<!-- SUBATRIBUTOS -->
+<div class="box"><h2>Corpo</h2>
+<label>Força</label><input id="forca">
+<label>Destreza</label><input id="destreza">
+<label>Vigor</label><input id="vigor"></div>
+
+<div class="box"><h2>Mente</h2>
+<label>Percepção</label><input id="percepcao">
+<label>Persuasão</label><input id="persuasao">
+<label>Sapiência</label><input id="sapiencia"></div>
+
+<div class="box"><h2>Poder</h2>
+<label>Magia</label><input id="magia">
+<label>Sorte</label><input id="sorte">
+<label>Vontade</label><input id="vontade"></div>
+
+<!-- RECURSOS -->
+<div class="box">
+<h2>Recursos</h2>
+
+<label>Vida</label>
+<input id="vida">
+<button onclick="vida.value++">+ Vida</button>
+<button onclick="vida.value=Math.max(0,vida.value-1)">- Vida</button>
+
+<label>Sanidade</label>
+<input id="sanidade">
+<button onclick="sanidade.value++">+ Sanidade</button>
+<button onclick="sanidade.value=Math.max(0,sanidade.value-1)">- Sanidade</button>
+
+<label>Mana</label>
+<input id="mana">
+<button onclick="mana.value++">+ Mana</button>
+<button onclick="mana.value=Math.max(0,mana.value-1)">- Mana</button>
+</div>
+
+<!-- STATUS -->
+<div class="box">
+<h2>Status</h2>
+<div class="status">
+  <div class="dot" onclick="status(1)"></div>
+  <div class="dot" onclick="status(2)"></div>
+  <div class="dot" onclick="status(3)"></div>
+</div>
+<button onclick="reviver()">Voltar à Vida</button>
+<div id="overlay" class="overlayText"></div>
+</div>
+
+<!-- PROTEÇÕES -->
+<div class="box">
+<h2>Proteções</h2>
+<label>Cabeça</label><input id="protCabeca" value="0">
+<label>Torso</label><input id="protTorso" value="0">
+<label>Costas</label><input id="protCostas" value="0">
+<label>Braços</label><input id="protBracos" value="0">
+<label>Mãos</label><input id="protMaos" value="0">
+<label>Pernas</label><input id="protPernas" value="0">
+<label>Pés</label><input id="protPes" value="0">
+</div>
+
+<!-- ITENS -->
+<div class="box">
+<h2>Itens & Equipamentos</h2>
+<textarea id="itens" placeholder="Armas, armaduras, objetos, etc."></textarea>
+</div>
+
+<!-- ANOTAÇÕES -->
+<div class="box">
+<h2>Anotações</h2>
+<textarea id="anotacoes" placeholder="História, contatos, pistas, observações..."></textarea>
+</div>
+
+<!-- HABILIDADES -->
+<div class="box">
+<h2>Habilidades</h2>
+<h3>Habilidades Gerais</h3>
+<textarea id="habilidadesGerais"></textarea>
+<h3>Habilidade Passiva</h3>
+<textarea id="habilidadePassiva"></textarea>
+<h3>Habilidade Ativa</h3>
+<textarea id="habilidadeAtiva"></textarea>
+</div>
+
+<div class="box">
+<button onclick="salvar()">💾 Salvar Ficha</button>
+<button onclick="limpar()">🗑 Limpar</button>
+</div>
+
+<!-- TELA DE FICHAS -->
+<div id="telaFichas">
+<h2>📂 Minhas Fichas</h2>
+<div id="lista"></div>
+<button onclick="fecharTelaFichas()">⬅ Voltar</button>
+</div>
+
+<script>
+function calc(){
+  vida.value=(corpo.value||0)*5;
+  sanidade.value=(mente.value||0)*5;
+  mana.value=(poder.value||0)*5;
+}
+function status(n){
+  const dots = document.querySelectorAll('.dot');
+
+  if(n === 1){
+    dots[0].classList.add('white');
+  }
+
+  if(n === 2){
+    dots[1].classList.add('pink');
+    body.classList.add('morrendo');
+    overlay.innerText = 'MORRENDO...';
+  }
+
+  if(n === 3){
+    dots[2].classList.add('red');
+    body.classList.add('morto');
+    overlay.innerText = 'MORTO';
+  }
+}
+function reviver(){
+  vida.value=1;
+  sanidade.value=1;
+  mana.value=1;
+  body.className='';
+  overlay.innerText='';
+  document.querySelectorAll('.dot').forEach(d=>d.className='dot');
+}
+
+function salvar(){
+  const f={};
+  document.querySelectorAll('input,textarea').forEach(e=>f[e.id]=e.value);
+  localStorage.setItem('ficha_'+(nomePersonagem.value||Date.now()),JSON.stringify(f));
+  alert('Ficha salva 🐺');
+}
+
+function limpar(){
+  document.querySelectorAll('input,textarea').forEach(e=>e.value='');
+}
+
+function abrirTelaFichas(){
+  telaFichas.style.display='block';
+  lista.innerHTML='';
+  Object.keys(localStorage).filter(k=>k.startsWith('ficha_')).forEach(k=>{
+    lista.innerHTML+=`
+    <div class="fichaBtn">
+      ${k.replace('ficha_','')}
+      <button onclick="abrirFicha('${k}')">Abrir</button>
+      <button onclick="localStorage.removeItem('${k}');abrirTelaFichas()">Excluir</button>
+    </div>`;
+  });
+}
+
+function fecharTelaFichas(){ telaFichas.style.display='none'; }
+
+function abrirFicha(k){
+  const f=JSON.parse(localStorage.getItem(k));
+  Object.keys(f).forEach(id=>{
+    if(document.getElementById(id)) document.getElementById(id).value=f[id];
+  });
+  fecharTelaFichas();
+  calc();
+}
+
+function compartilhar(){
+  const f={};
+  document.querySelectorAll('input,textarea').forEach(e=>f[e.id]=e.value);
+  prompt('Copie o link:',location.href.split('#')[0]+'#'+btoa(JSON.stringify(f)));
+}
+
+if(location.hash){
+  const f=JSON.parse(atob(location.hash.substring(1)));
+  Object.keys(f).forEach(id=>{
+    if(document.getElementById(id)) document.getElementById(id).value=f[id];
+  });
+  calc();
+}
+</script>
+
+</body>
+</html>
